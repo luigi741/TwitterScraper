@@ -129,6 +129,7 @@ const getTech = async () => {
 	});
 }
 
+getTweets('machinelearning');
 // getTech();
 // setInterval(getTech, 30000);
 

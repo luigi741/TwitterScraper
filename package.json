@@ -1,0 +1,21 @@
+{
+	"name": "twitterscraper",
+	"version": "0.1.0",
+	"description": "A Node.js script that scrapes data from Twitter and stores results into a database",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "nodemon server.js"
+	},
+	"author": "Luis Castro",
+	"license": "ISC",
+	"dependencies": {
+		"body-parser": "^1.19.0",
+		"cors": "^2.8.5",
+		"dotenv": "^8.2.0",
+		"express": "^4.17.1",
+		"pg": "^7.17.0",
+		"request": "^2.88.0",
+		"request-promise": "^4.2.5"
+	}
+}

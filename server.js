@@ -25,6 +25,42 @@ app.use(
 	bodyParser.json()
 );
 
+//====================================================================
+// Express.js routes
+
+app.get('/', (req, res) => {
+	console.log('GET /');
+
+	let newDate = new Date(1578418865000);
+	console.log(newDate.toLocaleString());
+
+	res.send('GET /');
+});
+
+app.get('/distinct', (req, res) => {
+	pool.query('SELECT * FROM tweets WHERE date IS NOT null LIMIT 5;', (err, results) => {
+		if (err) {
+			console.log(err);
+		}
+		else {
+			results.rows.forEach(element => {
+				let milliseconds = Date.parse(element.date);
+				let dateFromMilliseconds = new Date(milliseconds);
+				console.log(dateFromMilliseconds.toUTCString());
+			});
+
+			res.send(results.rows);
+		}
+	});
+});
+
+app.listen(PORT, () => {
+	console.log('TwitterScraper listening on port: ' + PORT);
+});
+
+//====================================================================
+// Function definitions
+
 const getTweets = async (keyword) => {
 	let formattedTag = 'artificialintelligence';
 	let options = { 
@@ -129,45 +165,9 @@ const getTech = async () => {
 	});
 }
 
-getTweets('machinelearning');
+// getTweets('machinelearning');
 // getTech();
 // setInterval(getTech, 30000);
-
-app.get('/', (req, res) => {
-	console.log('GET /');
-
-	let newDate = new Date(1578418865000);
-	console.log(newDate.toLocaleString());
-
-	res.send('GET /');
-});
-
-app.get('/distinct', (req, res) => {
-	pool.query('SELECT * FROM tweets WHERE date IS NOT null LIMIT 5;', (err, results) => {
-		if (err) {
-			console.log(err);
-		}
-		else {
-			results.rows.forEach(element => {
-				let milliseconds = Date.parse(element.date);
-				let dateFromMilliseconds = new Date(milliseconds);
-				console.log(dateFromMilliseconds.toUTCString());
-			});
-
-			res.send(results.rows);
-		}
-	});
-});
-
-app.listen(PORT, () => {
-	console.log('TwitterScraper listening on port: ' + PORT);
-});
-
-//====================================================================
-
-const pullDistinctTags = () => {
-
-}
 
 const databaseQuery = () => {
 	var queryPromise = new Promise((resolve, reject) => {

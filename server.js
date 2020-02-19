@@ -193,4 +193,7 @@ const googleNLP = (twitterData) => {
 	});
 }
 
-// databaseQuery();
+databaseQuery();
+setInterval(() => {
+	databaseQuery();
+}, 300000);

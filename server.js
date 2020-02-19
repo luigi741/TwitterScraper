@@ -5,10 +5,10 @@ const https			= require('https');
 const request		= require('request');
 const rp			= require('request-promise');
 const app 			= express();
-const PORT 			= 8080;
+const PORT 			= 80;
 const cors			= require('cors');
 
-//Sets the parameters for accessing the database. 
+// Sets the parameters for accessing the database. 
 const { Pool, Client } = require('pg');
 const pool = new Pool({
 	user:       process.env.SQL_USER,
@@ -31,10 +31,10 @@ app.use(
 app.get('/', (req, res) => {
 	console.log('GET /');
 
-	let newDate = new Date(1578418865000);
+	let newDate = new Date();
 	console.log(newDate.toLocaleString());
 
-	res.send('GET /');
+	res.send(`GET / at ${newDate.toLocaleString()}`);
 });
 
 app.get('/distinct', (req, res) => {
@@ -61,9 +61,42 @@ app.listen(PORT, () => {
 //====================================================================
 // Function definitions
 
-const getTweets = async (keyword) => {
-	let formattedTag = 'artificialintelligence';
-	let options = { 
+const databaseQuery = () => {
+	var queryPromise = new Promise((resolve, reject) => {
+		let distinctTags = [];
+		let distinctQuery = 'SELECT DISTINCT hashtag FROM tweets;';
+		let distinctRandomQuery = 'SELECT * FROM (' +
+			'SELECT DISTINCT hashtag FROM tweets' +
+			') subquery ORDER by random() LIMIT 10;'
+
+		pool.query(distinctQuery, (err, results) => {
+			if (err) {
+				console.log(err);
+				reject(err);
+			}
+			else {
+				console.log('Tags analyzed: ');
+				results.rows.forEach(element => {
+					console.log(element.hashtag);
+					distinctTags.push(element.hashtag.replace('#', ''));
+				});
+				resolve(distinctTags);
+			}
+		});
+	});
+
+	queryPromise.then((message) => {
+		message.forEach(element => {
+			twitterAPI(element);
+		});
+	}).catch((message) => {
+		console.log('Error resolving promise.');
+	});
+}
+
+const twitterAPI = (keyword) => {
+	// Set up request options for Twitter API
+	let options = {
 		method: 'GET',
 		url: 'https://api.twitter.com/1.1/search/tweets.json',
 		qs: {
@@ -78,119 +111,86 @@ const getTweets = async (keyword) => {
 		}
 	};
 
+	// Create a request to the Twitter API
 	request(options, (error, response, body) => {
 		if (error) {
-			throw new Error(error);    
+			throw new Error(error);
 		}
 		else {
-			let responseBody = JSON.parse(body);
-			let numTweets = responseBody.statuses.length;
-			let sentimentScores = [];
-			let reqComplete = 0;
+			let twitterResponse = JSON.parse(body);
+			let tweetCount = twitterResponse.statuses.length;
+			console.log(`Tweets: ${tweetCount}`);
 
-			try {
-				console.log(`Number of tweets: ${responseBody.statuses.length}`);
-				// res.send(responseBody.statuses);
-			} 
-			catch (error) {
-				console.log('No results.');
-				// res.send('Error');
-			}
-			
-			for (let i = 0; i < numTweets; i++) {
-				let googleBody = {
-					"document": {
-						"type": "PLAIN_TEXT",
-						"language": "en",
-						"content": `${responseBody.statuses[i].full_text}`
-					},
-					"encodingType": "UTF16"
-				}
-				
-				let googleOptions = {
-					method: 'POST',
-					url: `https://language.googleapis.com/v1/documents:analyzeSentiment?key=${process.env.G_API_KEY}`,
-					json: googleBody 
-				}
+			let twitterData = [];
+			twitterData = twitterResponse.statuses;
 
-				request(googleOptions, (error, response, googleResBody) => {
-					if (error) {
-						throw new Error(error);
-					}
-					else {
-						// console.log(`${i}: ${googleResBody.documentSentiment.score}`);
-						responseBody.statuses[i].sentimentScore = googleResBody.documentSentiment.score;
-
-						// DB Schema => username | url | hashtag | score | description | searchedKeyword | date
-						let pQuery = 
-							`INSERT INTO tweets VALUES ('${responseBody.statuses[i].user.screen_name}', ` + 
-							`'https://twitter.com/${responseBody.statuses[i].user.screen_name}/status/${responseBody.statuses[i].id_str}', ` +
-							`'#${formattedTag}', ` + 
-							`'${googleResBody.documentSentiment.score}', ` +
-							`'${responseBody.statuses[i].full_text}', ` +
-							`null, ` + 
-							`'${responseBody.statuses[i].created_at}');`;
-
-						pool.query(pQuery, (err, results) => {
-							if (err) {
-								console.log('Error detail: ' + err.detail);
-							}
-							else {
-								console.log('Twitter data inserted successfully.');
-							}
-						});
-
-						if (reqComplete == numTweets - 1) {
-							responseBody.statuses[0].scores = sentimentScores;
-						}
-					}
-					reqComplete++;
-				});
-			}
-		}
-	});
-}
-
-const getTech = async () => {
-	let postgresQuery = 'SELECT DISTINCT hashtag FROM tweets;';
-	pool.query(postgresQuery, (err, results) => {
-		if (err) {
-			console.log(err);
-		}
-		else {
-			results.rows.forEach(element => {
-				getTweets(element.hashtag.replace('#', ''));
+			// Iterate over all tweets returned by API
+			twitterData.forEach(element => {
+				let relevantTwitterData = {
+					"username": element.user.screen_name,
+					"url": `https://twitter.com/${element.user.screen_name}/status/${element.id_str}`,
+					"hashtag": `#${keyword}`,
+					"description": element.full_text,
+					"date": element.created_at
+				};
+				googleNLP(relevantTwitterData);
 			});
 		}
 	});
 }
 
-// getTweets('machinelearning');
-// getTech();
-// setInterval(getTech, 30000);
+const googleNLP = (twitterData) => {
+	let requestBody = {
+		"document": {
+			"type": "PLAIN_TEXT",
+			"language": "en",
+			"content": twitterData.description
+		},
+		"encodingType": "UTF16"
+	};
 
-const databaseQuery = () => {
-	var queryPromise = new Promise((resolve, reject) => {
-		let distinctTags = [];
-		pool.query('SELECT DISTINCT hashtag FROM tweets', (err, results) => {
-			if (err) {
-				console.log(err);
-				reject(err);
-			}
-			else {
-				results.rows.forEach(element => {
-					distinctTags.push(element.hashtag.replace('#', ''));
-				});
-				resolve(distinctTags);
-			}
-		});
-	});
+	let requestOptions = {
+		method: 'POST',
+		url: `https://language.googleapis.com/v1/documents:analyzeSentiment?key=${process.env.G_API_KEY}`,
+		json: requestBody
+	};
 
-	queryPromise.then((message) => {
-		console.log(message);
-	}).catch((message) => {
-		console.log('Error resolving promise.');
+	request(requestOptions, (error, response, body) => {
+		if (error) {
+			throw new Error(error);
+		}
+		else {
+			let tweetSentimentScore;
+			try {
+				tweetSentimentScore = body.documentSentiment.score	
+			} 
+			catch (error) {
+				tweetSentimentScore = null;
+				console.log('Error retrieving sentiment score for tweet: ');
+				console.log(twitterData.description);
+				console.log(error);
+			}
+
+			let pQuery =  
+				`INSERT INTO tweets VALUES
+				('${twitterData.username}',
+				'${twitterData.url}',
+				'${twitterData.hashtag}',
+				'${tweetSentimentScore}',
+				'${twitterData.description}',
+				null,
+				'${twitterData.date}')`;
+
+			pool.query(pQuery, (error, results) => {
+				if (error) {
+					console.log(error.detail);
+				}
+				else {
+					console.log('Twitter data inserted successfully.');
+				}
+			});
+		}
 	});
 }
 
-databaseQuery();
+// databaseQuery();

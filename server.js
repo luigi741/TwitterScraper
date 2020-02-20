@@ -69,7 +69,7 @@ const databaseQuery = () => {
 			'SELECT DISTINCT hashtag FROM tweets' +
 			') subquery ORDER by random() LIMIT 1;'
 
-		pool.query(distinctQuery, (err, results) => {
+		pool.query(distinctRandomQuery, (err, results) => {
 			if (err) {
 				console.log(err);
 				reject(err);

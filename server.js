@@ -249,7 +249,8 @@ const scoreTweets = () => {
 	});
 }
 
-databaseQuery();
-setInterval(() => {
-	databaseQuery();
-}, 300000);
+scoreTweets();
+// databaseQuery();
+// setInterval(() => {
+// 	databaseQuery();
+// }, 300000);

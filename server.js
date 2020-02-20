@@ -200,7 +200,7 @@ const insertTweet = (twitterData) => {
 		('${twitterData.username}',
 		'${twitterData.url}',
 		'${twitterData.hashtag}',
-		'${tweetSentimentScore}',
+		null,
 		'${twitterData.description}',
 		null,
 		'${twitterData.date}')`;

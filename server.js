@@ -212,6 +212,7 @@ const insertTweet = (twitterData) => {
 			if (error.detail == 'undefined' || error.detail == undefined) {
 				console.log('Syntax error.');
 				console.log('Tweet causing error: ' + twitterData.description);
+				console.log(pQuery);
 			}
 			else {
 				console.log(error.detail);

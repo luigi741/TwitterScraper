@@ -208,7 +208,8 @@ const insertTweet = (twitterData) => {
 	pool.query(pQuery, (error, results) => {
 		if (error) {
 			if (error.detail == 'undefined' || error.detail == undefined) {
-				console.log(error);
+				console.log('Syntax error.'):
+				console.log('Tweet causing error: ' + twitterData.description);
 			}
 			else {
 				console.log(error.detail);

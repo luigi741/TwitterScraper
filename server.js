@@ -133,7 +133,8 @@ const twitterAPI = (keyword) => {
 					"description": element.full_text,
 					"date": element.created_at
 				};
-				googleNLP(relevantTwitterData);
+				// googleNLP(relevantTwitterData);
+				insertTweet(relevantTwitterData);
 			});
 		}
 	});
@@ -189,6 +190,27 @@ const googleNLP = (twitterData) => {
 					console.log('Twitter data inserted successfully.');
 				}
 			});
+		}
+	});
+}
+
+const insertTweet = (twitterData) => {
+	let pQuery =  
+		`INSERT INTO tweets VALUES
+		('${twitterData.username}',
+		'${twitterData.url}',
+		'${twitterData.hashtag}',
+		'${tweetSentimentScore}',
+		'${twitterData.description}',
+		null,
+		'${twitterData.date}')`;
+
+	pool.query(pQuery, (error, results) => {
+		if (error) {
+			console.log(error.detail);
+		}
+		else {
+			console.log('Twitter data inserted successfully.');
 		}
 	});
 }

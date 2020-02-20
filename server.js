@@ -28,35 +28,35 @@ app.use(
 //====================================================================
 // Express.js routes
 
-app.get('/', (req, res) => {
-	console.log('GET /');
+// app.get('/', (req, res) => {
+// 	console.log('GET /');
 
-	let newDate = new Date();
-	console.log(newDate.toLocaleString());
+// 	let newDate = new Date();
+// 	console.log(newDate.toLocaleString());
 
-	res.send(`GET / at ${newDate.toLocaleString()}`);
-});
+// 	res.send(`GET / at ${newDate.toLocaleString()}`);
+// });
 
-app.get('/distinct', (req, res) => {
-	pool.query('SELECT * FROM tweets WHERE date IS NOT null LIMIT 5;', (err, results) => {
-		if (err) {
-			console.log(err);
-		}
-		else {
-			results.rows.forEach(element => {
-				let milliseconds = Date.parse(element.date);
-				let dateFromMilliseconds = new Date(milliseconds);
-				console.log(dateFromMilliseconds.toUTCString());
-			});
+// app.get('/distinct', (req, res) => {
+// 	pool.query('SELECT * FROM tweets WHERE date IS NOT null LIMIT 5;', (err, results) => {
+// 		if (err) {
+// 			console.log(err);
+// 		}
+// 		else {
+// 			results.rows.forEach(element => {
+// 				let milliseconds = Date.parse(element.date);
+// 				let dateFromMilliseconds = new Date(milliseconds);
+// 				console.log(dateFromMilliseconds.toUTCString());
+// 			});
 
-			res.send(results.rows);
-		}
-	});
-});
+// 			res.send(results.rows);
+// 		}
+// 	});
+// });
 
-app.listen(PORT, () => {
-	console.log('TwitterScraper listening on port: ' + PORT);
-});
+// app.listen(PORT, () => {
+// 	console.log('TwitterScraper listening on port: ' + PORT);
+// });
 
 //====================================================================
 // Function definitions
@@ -224,17 +224,32 @@ const insertTweet = (twitterData) => {
 	});
 }
 
+const scoreTweets = () => {
+	let queryPromise = new Promise((resolve, reject) => {
+		let pQuery = 'SELECT * FROM tweets WHERE score IS NULL LIMIT 5;';
+		pool.query(pQuery, (error, results) => {
+			if (error) {
+				console.log(error);
+				reject(error);
+			}
+			else {
+				console.log(results.rows);
+				resolve(results.rows);
+			}
+		});
+	});
+
+	queryPromise.then(data => {
+		data.forEach(element => {
+			console.log(element);
+		});
+	}).catch(data => {
+		console.log('Error resolving promise.');
+		console.log(data);
+	});
+}
+
 databaseQuery();
 setInterval(() => {
 	databaseQuery();
 }, 300000);
-
-// const fixQuerySyntax = () => {
-// 	let errorString = "We're so looking forward to this! Can't stop, won't stop. #gaimin #gaiminio #cryptocurrency #blockchain #gmrx #tokensal…";
-// 	let syntaxCleanString = errorString.replace(/\'/g, "\\'");
-	
-// 	let pQuery = `'${syntaxCleanString}'`;
-// 	console.log(pQuery);
-// }
-
-// fixQuerySyntax();

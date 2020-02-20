@@ -242,6 +242,53 @@ const scoreTweets = () => {
 	queryPromise.then(data => {
 		data.forEach(element => {
 			console.log(element);
+
+			let nlpRequest = {
+				"document": {
+					"type": "PLAIN_TEXT",
+					"language": "en",
+					"content": element.description
+				},
+				"encodingType": "UTF16"
+			}
+
+			let nlpOptions = {
+				method: 'POST',
+				url: `https://language.googleapis.com/v1/documents:analyzeSentiment?key=${process.env.G_API_KEY}`,
+				json: nlpRequest
+			}
+
+			request(nlpOptions, (error, response, body) => {
+				if (error) {
+					throw new Error(error);
+				}
+				else {
+					let tweetSentimentScore;
+					try {
+						tweetSentimentScore = body.documentSentiment.score;
+					}
+					catch (exception) {
+						tweetSentimentScore = null;
+						console.log('Error retrieving sentiment score for tweet: ');
+						console.log(element.description);
+						console.log(exception);
+					}
+
+					let pQuery = 
+						`UPDATE tweets
+						SET score = ${tweetSentimentScore}
+						WHERE url = ${element.url}`;
+
+					pool.query(pQuery, (pgError, results) => {
+						if (pgError) {
+							console.log(pgError);
+						}
+						else {
+							console.log('Tweet sentiment score updated successfully.');
+						}
+					});
+				}
+			});
 		});
 	}).catch(data => {
 		console.log('Error resolving promise.');

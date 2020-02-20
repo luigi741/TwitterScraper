@@ -100,7 +100,7 @@ const twitterAPI = (keyword) => {
 		method: 'GET',
 		url: 'https://api.twitter.com/1.1/search/tweets.json',
 		qs: {
-			q: `%23${keyword}%20-filter%3Aretweets`,
+			q: `%23${keyword}%20-filter%3retweets`,
 			result_type: 'mixed',
 			tweet_mode: 'extended',
 			lang: 'en',

@@ -195,7 +195,7 @@ const googleNLP = (twitterData) => {
 }
 
 const insertTweet = (twitterData) => {
-	twitterData.description = twitterData.description.replace(/\'/g, "\'");
+	twitterData.description = twitterData.description.replace(/\'/g, "\\'");
 
 	let pQuery =  
 		`INSERT INTO tweets VALUES
@@ -228,3 +228,13 @@ databaseQuery();
 setInterval(() => {
 	databaseQuery();
 }, 300000);
+
+// const fixQuerySyntax = () => {
+// 	let errorString = "We're so looking forward to this! Can't stop, won't stop. #gaimin #gaiminio #cryptocurrency #blockchain #gmrx #tokensal…";
+// 	let syntaxCleanString = errorString.replace(/\'/g, "\\'");
+	
+// 	let pQuery = `'${syntaxCleanString}'`;
+// 	console.log(pQuery);
+// }
+
+// fixQuerySyntax();

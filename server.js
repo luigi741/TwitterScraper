@@ -241,8 +241,6 @@ const scoreTweets = () => {
 
 	queryPromise.then(data => {
 		data.forEach(element => {
-			console.log(element);
-
 			let nlpRequest = {
 				"document": {
 					"type": "PLAIN_TEXT",
@@ -276,8 +274,8 @@ const scoreTweets = () => {
 
 					let pQuery = 
 						`UPDATE tweets
-						SET score = ${tweetSentimentScore}
-						WHERE url = ${element.url}`;
+						SET score = '${tweetSentimentScore}'
+						WHERE url = '${element.url}'`;
 
 					pool.query(pQuery, (pgError, results) => {
 						if (pgError) {

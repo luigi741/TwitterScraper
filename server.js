@@ -207,7 +207,12 @@ const insertTweet = (twitterData) => {
 
 	pool.query(pQuery, (error, results) => {
 		if (error) {
-			console.log(error.detail);
+			if (error.detail == 'undefined' || error.detail == undefined) {
+				console.log(error);
+			}
+			else {
+				console.log(error.detail);
+			}
 		}
 		else {
 			console.log('Twitter data inserted successfully.');

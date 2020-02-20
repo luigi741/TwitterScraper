@@ -195,7 +195,7 @@ const googleNLP = (twitterData) => {
 }
 
 const insertTweet = (twitterData) => {
-	twitterData.description = twitterData.description.replace(/\'/g, "\\'");
+	twitterData.description = twitterData.description.replace(/\'/g, "''");
 
 	let pQuery =  
 		`INSERT INTO tweets VALUES

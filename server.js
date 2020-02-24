@@ -294,8 +294,38 @@ const scoreTweets = () => {
 	});
 }
 
-scoreTweets();
+// scoreTweets();
 // databaseQuery();
 // setInterval(() => {
 // 	databaseQuery();
 // }, 300000);
+
+const convertDate = () => {
+	let sqlDate = 'Thu Feb 19 17:06:04 +0000 2020';
+	let newDate = new Date(sqlDate);
+	let utcDate = newDate.toUTCString();
+	console.log(utcDate);
+
+	let nowDate = new Date().toUTCString();
+	console.log(nowDate);
+
+	let pgQuery = `SELECT * FROM tweets WHERE date IS NOT null LIMIT 5`;
+	let queryPromise = new Promise((resolve, reject) => {
+		pool.query(pgQuery, (error, result) => {
+			if (error) {
+				console.log(error);
+			}
+			else {
+				console.log(result.rows);
+			}
+		});
+	});
+
+	queryPromise.then(data => {
+
+	}).catch(data => {
+
+	});
+}
+
+convertDate();

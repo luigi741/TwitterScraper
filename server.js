@@ -301,30 +301,27 @@ const scoreTweets = () => {
 // }, 300000);
 
 const convertDate = () => {
-	let sqlDate = 'Thu Feb 19 17:06:04 +0000 2020';
-	let newDate = new Date(sqlDate);
-	let utcDate = newDate.toUTCString();
-	console.log(utcDate);
-
-	let nowDate = new Date().toUTCString();
-	console.log(nowDate);
-
 	let pgQuery = `SELECT * FROM tweets WHERE date IS NOT null LIMIT 5`;
 	let queryPromise = new Promise((resolve, reject) => {
 		pool.query(pgQuery, (error, result) => {
 			if (error) {
 				console.log(error);
+				reject(error);
 			}
 			else {
 				console.log(result.rows);
+				resolve(result.rows);
 			}
 		});
 	});
 
 	queryPromise.then(data => {
-
+		data.forEach(element => {
+			console.log(element.url);
+		});
 	}).catch(data => {
-
+		console.log('Error resolving promise.');
+		console.log(data);
 	});
 }
 

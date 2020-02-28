@@ -309,7 +309,7 @@ const convertDate = () => {
 				reject(error);
 			}
 			else {
-				console.log(result.rows);
+				// console.log(result.rows);
 				resolve(result.rows);
 			}
 		});
@@ -317,7 +317,15 @@ const convertDate = () => {
 
 	queryPromise.then(data => {
 		data.forEach(element => {
-			console.log(element.url);
+			let timestamp = new Date(element.date);
+			console.log(element.date);
+			console.log(timestamp);
+			let dateQuery = 
+				`UPDATE board_expo_qa
+				SET date = ${timestamp}
+				WHERE url = '${element.url}'`;
+			
+			console.log(dateQuery);
 		});
 	}).catch(data => {
 		console.log('Error resolving promise.');

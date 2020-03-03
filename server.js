@@ -294,8 +294,7 @@ const scoreTweets = () => {
 	});
 }
 
-scoreTweets();
 // databaseQuery();
-// setInterval(() => {
-// 	databaseQuery();
-// }, 300000);
+setInterval(() => {
+	scoreTweets();
+}, 300000);

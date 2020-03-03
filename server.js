@@ -234,7 +234,7 @@ const scoreTweets = () => {
 				reject(error);
 			}
 			else {
-				console.log(results.rows);
+				console.log(results.rows.url);
 				resolve(results.rows);
 			}
 		});

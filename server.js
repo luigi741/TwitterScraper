@@ -227,7 +227,7 @@ const insertTweet = (twitterData) => {
 
 const scoreTweets = () => {
 	let queryPromise = new Promise((resolve, reject) => {
-		let pQuery = 'SELECT * FROM tweets WHERE score IS NULL ORDER BY RANDOM() LIMIT 100;';
+		let pQuery = 'SELECT * FROM tweets WHERE score IS NULL ORDER BY RANDOM() LIMIT 1000;';
 		pool.query(pQuery, (error, results) => {
 			if (error) {
 				console.log(error);

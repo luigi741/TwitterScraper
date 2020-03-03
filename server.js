@@ -240,8 +240,9 @@ const scoreTweets = () => {
 		});
 	});
 
+	let succesfulInserts = 0;
 	queryPromise.then(data => {
-		let succesfulInserts = 0;
+		
 		data.forEach((element, index) => {
 			let nlpRequest = {
 				"document": {

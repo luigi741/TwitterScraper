@@ -291,7 +291,7 @@ const scoreTweets = () => {
 				}
 			});
 
-			if (index = data.length - 1) {
+			if (index == data.length - 1) {
 				console.log(`Successful inserts: ${succesfulInserts}`);
 			}
 		});

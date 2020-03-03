@@ -242,7 +242,7 @@ const scoreTweets = () => {
 
 	queryPromise.then(data => {
 		let succesfulInserts = 0;
-		data.forEach(element => {
+		data.forEach((element, index) => {
 			let nlpRequest = {
 				"document": {
 					"type": "PLAIN_TEXT",
@@ -290,8 +290,11 @@ const scoreTweets = () => {
 					});
 				}
 			});
+
+			if (index = data.length - 1) {
+				console.log(`Successful inserts: ${succesfulInserts}`);
+			}
 		});
-		console.log(`Successful inserts: ${succesfulInserts}`);
 	}).catch(data => {
 		console.log('Error resolving promise.');
 		console.log(data);

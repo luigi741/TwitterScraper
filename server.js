@@ -180,7 +180,8 @@ const googleNLP = (twitterData) => {
 				'${tweetSentimentScore}',
 				'${twitterData.description}',
 				null,
-				'${twitterData.date}')`;
+				now());`;
+				// '${twitterData.date}')`;
 
 			pool.query(pQuery, (error, results) => {
 				if (error) {
@@ -205,7 +206,7 @@ const insertTweet = (twitterData) => {
 		null,
 		'${twitterData.description}',
 		null,
-		'${twitterData.date}')`;
+		now())`;
 
 	pool.query(pQuery, (error, results) => {
 		if (error) {
@@ -333,4 +334,38 @@ const convertDate = () => {
 	});
 }
 
-convertDate();
+// convertDate();
+
+const consolidateTweets = () => {
+	let pgQuery = 'SELECT COUNT(DISTINCT description) FROM tweets;';
+	let queryPromise = new Promise((resolve, reject) => {
+		pool.query(pgQuery, (error, result) => {
+			if (error) {
+				reject(error);
+			}
+			else {
+				resolve(result.rows);
+			}
+		});
+	});
+
+	queryPromise.then(data => {
+		data.forEach(element => {
+			let insertQuery = 
+				`INSERT INTO distinct_tweets VALUES (
+					'${element.name}',
+					'${element.url}',
+					'${element.hashtag}',
+					${element.score},
+					'${element.description}',
+					'${element.searchKeyword}',
+					'${element.date}'
+				);`;
+			
+			console.log(insertQuery);
+		});
+	}).catch(data => {
+		console.log('Error resolving promise.');
+		console.log(data);
+	});
+}

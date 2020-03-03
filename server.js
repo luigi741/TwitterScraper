@@ -234,13 +234,14 @@ const scoreTweets = () => {
 				reject(error);
 			}
 			else {
-				console.log(results.rows.url);
+				// console.log(results.rows.url);
 				resolve(results.rows);
 			}
 		});
 	});
 
 	queryPromise.then(data => {
+		let succesfulInserts = 0;
 		data.forEach(element => {
 			let nlpRequest = {
 				"document": {
@@ -283,12 +284,14 @@ const scoreTweets = () => {
 							console.log(pgError);
 						}
 						else {
-							console.log('Tweet sentiment score updated successfully.');
+							// console.log('Tweet sentiment score updated successfully.');
+							succesfulInserts++;
 						}
 					});
 				}
 			});
 		});
+		console.log(`Successful inserts: ${succesfulInserts}`);
 	}).catch(data => {
 		console.log('Error resolving promise.');
 		console.log(data);

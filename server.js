@@ -295,6 +295,7 @@ const scoreTweets = () => {
 }
 
 // databaseQuery();
+scoreTweets();
 setInterval(() => {
 	scoreTweets();
-}, 300000);
+}, 5000);

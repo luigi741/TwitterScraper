@@ -320,10 +320,11 @@ const convertDate = () => {
 			let timestamp = new Date(element.date);
 			console.log(element.date);
 			console.log(timestamp);
-			let dateQuery = 
-				`UPDATE board_expo_qa
+			let dateQuery = `
+				UPDATE board_expo_qa
 				SET date = ${timestamp}
-				WHERE url = '${element.url}'`;
+				WHERE url = '${element.url}'
+			`;
 			
 			console.log(dateQuery);
 		});
